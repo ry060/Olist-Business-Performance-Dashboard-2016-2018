@@ -1,21 +1,28 @@
 import sqlite3
+from pathlib import Path
 import pandas as pd
-import streamlit as st
 import plotly.express as px
 import json
 
 # Querying SQL Database inside Streamlit
 st.set_page_config(page_title = 'Olist Business Performance Dashboard', layout = 'wide')
-@st.cache_resource
-def get_connection():
-    return sqlite3.connect('olist.db', check_same_thread = False)
-conn = get_connection()
+from olist_db_setup import create_database
+BASE_DIR = Path(__file__).resolve().parent
+DB_PATH = BASE_DIR / "olist.db"
+
+if not DB_PATH.exists():
+    with st.spinner("Preparing the dashboard data. This may take a moment..."):
+        create_database()
+
+conn = sqlite3.connect(DB_PATH)
+
+# Setting Up Dashboard Title and Description
 st.title('Olist Business Performance Dashboard')
 st.markdown("Olist is a Brazilian e-commerce technology company\n" \
 "that acts as an intermediary platform for business to major online marketplaces.\n" \
 "This dashboard showcases the yearly financial performance, operational efficiency\n" \
 "and logistical challenges of Olist's marketplace model. By analysing over 100,000 orders across Brazil\n" \
-"from October 2016 to December 2018, it tracks Key Performance Indicators such as\n" \
+"from October 2016 to September 2018, it tracks Key Performance Indicators such as\n" \
 "Total Orders, Total Revenue and On-Time Rate.")
 
 # Filtering by year
